@@ -11,35 +11,6 @@
       body {
         font-family: "Inter", sans-serif;
       }
-      .video-wrapper.playing .thumbnail-overlay {
-        opacity: 0;
-        pointer-events: none;
-      }
-
-      .video-container {
-        box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
-        transition: box-shadow 0.3s ease;
-      }
-
-      .video-container:hover {
-        box-shadow: 0 0 40px rgba(0, 255, 0, 0.3);
-      }
-
-      .play-button {
-        animation: pulse 2s infinite;
-      }
-
-      @keyframes pulse {
-        0% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.05);
-        }
-        100% {
-          transform: scale(1);
-        }
-      }
     </style>
   </head>
   <body class="font-sans">
@@ -593,55 +564,48 @@
             </p>
           </div>
         </div>
-        <div class="max-w-4xl w-full mx-auto">
-          <!-- Video Container -->
-          <div class="video-wrapper relative" id="videoWrapper">
-            <!-- Custom Border with Glow Effect -->
-            <div
-              class="video-container relative aspect-video rounded-xl overflow-hidden"
+        <div class="w-full max-w-6xl mx-auto px-4">
+          <div
+            id="videoWrapper"
+            class="relative aspect-video w-full overflow-hidden rounded-xl shadow-xl opacity-0 transform translate-y-5"
+          >
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-NFcA6fMpnxyDjwalJ0frmRFyw61y26.png"
+              alt="Business presentation"
+              class="w-full h-full object-cover"
+              id="thumbnail"
+            />
+            <button
+              id="playButton"
+              class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 transition-colors hover:bg-opacity-40 group"
+              aria-label="Play video"
             >
-              <!-- Thumbnail Overlay -->
               <div
-                class="thumbnail-overlay absolute inset-0 z-10 transition-opacity duration-500"
-                id="thumbnailOverlay"
+                class="rounded-full bg-primary p-4 transition-transform group-hover:scale-110"
               >
-                <img
-                  src="https://sjc.microlink.io/SJ0OtdmhQ1t9dmvhA4rCJ9qZgWsyMbH1Mh2UKN9mvfyWfJEvSASwhqPe6zmfiJ8dZt7V3N9WXs48qjRkvhKGyQ.jpeg"
-                  alt="Muppets Bohemian Rhapsody thumbnail"
-                  class="w-full h-full object-cover"
-                />
-                <!-- Play Button -->
-                <button
-                  onclick="playVideo()"
-                  class="play-button absolute inset-0 w-full h-full flex items-center justify-center bg-black/40 hover:bg-black/60 transition-colors group"
+                <svg
+                  class="w-8 h-8 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <div
-                    class="w-20 h-20 flex items-center justify-center rounded-full bg-green-500 group-hover:bg-green-400 transition-colors"
-                  >
-                    <svg
-                      class="w-10 h-10 text-white ml-1"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </div>
-                </button>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                  ></path>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
               </div>
-
-              <!-- YouTube iFrame -->
-              <iframe
-                id="youtubeIframe"
-                width="100%"
-                height="100%"
-                src="https://www.youtube.com/embed/tgbNymZ7vqY?enablejsapi=1&autoplay=0&rel=0"
-                title=""
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-                class="absolute inset-0 w-full h-full"
-              ></iframe>
-            </div>
+            </button>
+            <div id="youtubePlayer" class="w-full h-full hidden"></div>
           </div>
         </div>
       </div>
@@ -1330,45 +1294,94 @@
       );
 
       observer2.observe(document.querySelector("#stats-section"));
-    </script>
-    <script>
-      // YouTube API Integration
-      let tag = document.createElement("script");
+      var tag = document.createElement("script");
       tag.src = "https://www.youtube.com/iframe_api";
-      let firstScriptTag = document.getElementsByTagName("script")[0];
+      var firstScriptTag = document.getElementsByTagName("script")[0];
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-      let player;
+      var player;
       function onYouTubeIframeAPIReady() {
-        player = new YT.Player("youtubeIframe", {
+        player = new YT.Player("youtubePlayer", {
+          height: "100%",
+          width: "100%",
+          videoId: "dQw4w9WgXcQ", // Replace with your YouTube video ID
+          playerVars: {
+            autoplay: 0,
+            controls: 1,
+            rel: 0,
+            showinfo: 0,
+          },
           events: {
-            onStateChange: onPlayerStateChange,
+            onReady: onPlayerReady,
           },
         });
       }
 
-      function onPlayerStateChange(event) {
-        if (event.data == YT.PlayerState.PLAYING) {
-          document.getElementById("videoWrapper").classList.add("playing");
-        }
+      function onPlayerReady(event) {
+        document.getElementById("playButton").addEventListener("click", () => {
+          const thumbnail = document.getElementById("thumbnail");
+          const playButton = document.getElementById("playButton");
+          const youtubePlayer = document.getElementById("youtubePlayer");
+
+          anime({
+            targets: [thumbnail, playButton],
+            opacity: 0,
+            duration: 400,
+            easing: "easeOutQuad",
+            complete: () => {
+              thumbnail.classList.add("hidden");
+              playButton.classList.add("hidden");
+              youtubePlayer.classList.remove("hidden");
+              player.playVideo();
+
+              anime({
+                targets: youtubePlayer,
+                opacity: [0, 1],
+                duration: 400,
+                easing: "easeInQuad",
+              });
+            },
+          });
+        });
       }
 
-      function playVideo() {
-        if (player && player.playVideo) {
-          player.playVideo();
-          document.getElementById("videoWrapper").classList.add("playing");
-        }
-      }
+      window.addEventListener("DOMContentLoaded", () => {
+        anime({
+          targets: "#videoWrapper",
+          opacity: [0, 1],
+          translateY: [20, 0],
+          duration: 1000,
+          easing: "easeOutExpo",
+        });
 
-      // Add loading animation
-      document.addEventListener("DOMContentLoaded", () => {
-        const wrapper = document.getElementById("videoWrapper");
-        wrapper.style.opacity = "0";
+        anime({
+          targets: "#playButton",
+          scale: [0, 1],
+          opacity: [0, 1],
+          delay: 500,
+          duration: 800,
+          easing: "easeOutElastic(1, .5)",
+        });
+      });
 
-        setTimeout(() => {
-          wrapper.style.transition = "opacity 0.5s ease";
-          wrapper.style.opacity = "1";
-        }, 100);
+      const playButton = document.getElementById("playButton");
+
+      playButton.addEventListener("mouseenter", () => {
+        anime({
+          targets: "#playButton svg",
+          scale: 1.2,
+          duration: 300,
+          easing: "easeOutQuad",
+        });
+      });
+
+      playButton.addEventListener("mouseleave", () => {
+        anime({
+          targets: "#playButton svg",
+          scale: 1,
+          duration: 300,
+          easing: "easeOutQuad",
+        });
       });
     </script>
   </body>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ghum Parani Bondhu - Music Video</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .youtube-container.playing .thumbnail-overlay {
+        opacity: 0;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-900 min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-3xl mx-auto">
+      <!-- Video Container -->
+      <div
+        id="youtubeContainer"
+        class="youtube-container relative aspect-video rounded-xl overflow-hidden shadow-2xl"
+      >
+        <!-- Thumbnail Overlay -->
+        <div
+          class="thumbnail-overlay absolute inset-0 z-10 transition-opacity duration-300"
+        >
+          <img
+            src="https://sjc.microlink.io/KZM0H6lvfz85spf296zEfypXDi5FSZNShzeY6OcgGLPIUbtAZbpuFpnMT_B_0dUTZ_wzD8LwSs6xuF_Nz70Usg.jpeg"
+            alt="Video thumbnail"
+            class="w-full h-full object-cover"
+          />
+          <!-- Play Button -->
+          <button
+            id="playBtn"
+            class="absolute inset-0 w-full h-full flex items-center justify-center bg-black/40 hover:bg-black/50 transition-colors group"
+            aria-label="Play video"
+          >
+            <div
+              class="w-20 h-20 flex items-center justify-center rounded-full bg-red-600 group-hover:bg-red-700 transform group-hover:scale-110 transition-all duration-300"
+            >
+              <svg
+                class="w-10 h-10 text-white ml-2"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+          </button>
+        </div>
+
+        <!-- YouTube Player -->
+        <div id="youtubePlayer" class="w-full h-full"></div>
+      </div>
+
+      <!-- Video Info -->
+      <div class="mt-4 text-white px-2">
+        <h1 class="text-xl font-bold">
+          Ghum Parani Bondhu | ঘুম পাড়ানি বন্ধু | F A Sumon
+        </h1>
+        <p class="text-gray-400 mt-2">G Series Music</p>
+      </div>
+    </div>
+
+    <script>
+      // Initialize YouTube API
+      let tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/watch?v=5iEgfqugU5Y";
+      document.head.appendChild(tag);
+
+      let player;
+      let isPlayerReady = false;
+
+      // YouTube Player Setup
+      window.onYouTubeIframeAPIReady = function () {
+        player = new YT.Player("youtubePlayer", {
+          height: "100%",
+          width: "100%",
+          videoId: "nuXFBa6ZSaU",
+          playerVars: {
+            autoplay: 0,
+            controls: 1,
+            rel: 0,
+            showinfo: 0,
+            modestbranding: 1,
+            playsinline: 1,
+          },
+          events: {
+            onReady: onPlayerReady,
+            onStateChange: onPlayerStateChange,
+            onError: onPlayerError,
+          },
+        });
+      };
+
+      // Player Event Handlers
+      function onPlayerReady(event) {
+        isPlayerReady = true;
+        const playBtn = document.getElementById("playBtn");
+
+        playBtn.addEventListener("click", function () {
+          if (isPlayerReady) {
+            player.playVideo();
+            document
+              .getElementById("youtubeContainer")
+              .classList.add("playing");
+          }
+        });
+      }
+
+      function onPlayerStateChange(event) {
+        if (event.data === YT.PlayerState.PLAYING) {
+          document.getElementById("youtubeContainer").classList.add("playing");
+        }
+      }
+
+      function onPlayerError(event) {
+        console.error("YouTube Player Error:", event.data);
+        const container = document.getElementById("youtubeContainer");
+
+        // Show error message
+        const errorMessage = document.createElement("div");
+        errorMessage.className =
+          "absolute inset-0 flex items-center justify-center bg-black/80 text-white text-center p-4 z-20";
+        errorMessage.innerHTML =
+          "Sorry, there was an error playing the video. Please try again later.";
+        container.appendChild(errorMessage);
+      }
+
+      // Add loading animation
+      document.addEventListener("DOMContentLoaded", function () {
+        const container = document.getElementById("youtubeContainer");
+        container.style.opacity = "0";
+
+        setTimeout(() => {
+          container.style.transition = "opacity 0.5s ease";
+          container.style.opacity = "1";
+        }, 100);
+      });
+    </script>
+  </body>
+</html>
